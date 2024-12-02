@@ -33,7 +33,7 @@ tiendas = [
     {
         'tenant_id': tenant_id,
         'datos': { 'nombre': tenant_id },
-        'fechaCreacion': faker.date_time_between(start_date=datetime(2021, 10, 1), end_date=datetime(2022, 1, 1))
+        'fechaCreacion': faker.date_time_between(start_date=datetime(2021, 10, 1), end_date=datetime(2022, 1, 1)).isoformat()
     }
     for tenant_id in tenant_ids
 ]
@@ -89,7 +89,7 @@ usuarios = [
         'password': faker.password(),
         'data': { 'fullName': faker.name() },
         'role': "user",
-        'fechaCreacion': (fecha_creacion := faker.date_time_between(start_date=datetime(2022, 1, 1), end_date=datetime(2024, 12, 31))),
+        'fechaCreacion': (fecha_creacion := faker.date_time_between(start_date=datetime(2022, 1, 1), end_date=datetime(2024, 12, 31))).isoformat(),
         'ultimoAcceso': faker.date_time_between(start_date=fecha_creacion, end_date=datetime(2024, 12, 31)).isoformat()
     }
     for _ in range(10000)
@@ -105,7 +105,7 @@ resenias = [
             'puntaje': random.randint(1, 5),
             'comentario': faker.sentence(),
         },
-        'fecha': faker.date_time_between(start_date=datetime(2022, 1, 1), end_date=datetime(2024, 12, 31)),
+        'fecha': faker.date_time_between(start_date=datetime(2022, 1, 1), end_date=datetime(2024, 12, 31)).isoformat(),
         'datos': 1
     }
     for _ in range(10000)
@@ -150,7 +150,7 @@ pedidos = [
                 for producto_id in productosID if producto_id in productos_dict
             )
         },
-        'fechaPedido': fecha_pedido
+        'fechaPedido': fecha_pedido.isoformat()
     }
     for usuario in usuarios for _ in range(random.randint(1, 3))
 ]
