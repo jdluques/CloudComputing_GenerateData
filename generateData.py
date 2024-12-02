@@ -19,12 +19,12 @@ session = boto3.Session(
 
 dynamodb = session.resource('dynamodb')
 
-tienda_table = dynamodb.Table('Tienda')
-categoria_table = dynamodb.Table('Categoria')
-usuario_table = dynamodb.Table('Usuario')
-producto_table = dynamodb.Table('Producto')
-pedido_table = dynamodb.Table('Pedido')
-resenia_table = dynamodb.Table('Resenia')
+tienda_table = dynamodb.Table('api-tienda-proyecto-dev-tienda')
+categoria_table = dynamodb.Table('dev-t_categorias')
+usuario_table = dynamodb.Table('dev-usuarios')
+producto_table = dynamodb.Table('dev-proyecto_productos')
+pedido_table = dynamodb.Table('dev-proyecto-pedidos')
+resenia_table = dynamodb.Table('dev-proyecto_resenias')
 
 # Tienda
 tenant_ids = ["Lunavie", "Glow", "Lumiere"]
@@ -33,7 +33,7 @@ tiendas = [
     {
         'tenant_id': tenant_id,
         'datos': { 'nombre': tenant_id },
-        'fechaCreacion': faker.date_time_between(start_date="2021-10-01", end_date="2022-01-01")
+        'fechaCreacion': faker.date_time_between(start_date=datetime(2021, 10, 1), end_date=datetime(2022, 1, 1))
     }
     for tenant_id in tenant_ids
 ]
@@ -49,7 +49,7 @@ categ_descriptions = {
 
 categorias = [
     {
-        'tenant_id': tenant_ids[i],
+        'tenant_id': tenant_ids[i % len(tenant_ids)],  # Usa el módulo para repetir los elementos si es necesario
         'categoria_id': faker.uuid4(),
         'nombre': categ_name,
         'data': { 'descripcion': categ_descriptions[categ_name] }
@@ -89,8 +89,8 @@ usuarios = [
         'password': faker.password(),
         'data': { 'fullName': faker.name() },
         'role': "user",
-        'fechaCreacion': (fecha_creacion := faker.date_time_between(start_date="2022-01-01", end_date="2024-12-31")),
-        'ultimoAcceso': faker.date_time_between(start_date=fecha_creacion, end_date="2024-12-31").isoformat()
+        'fechaCreacion': (fecha_creacion := faker.date_time_between(start_date=datetime(2022, 1, 1), end_date=datetime(2024, 12, 31))),
+        'ultimoAcceso': faker.date_time_between(start_date=fecha_creacion, end_date=datetime(2024, 12, 31)).isoformat()
     }
     for _ in range(10000)
 ]
@@ -105,7 +105,7 @@ resenias = [
             'puntaje': random.randint(1, 5),
             'comentario': faker.sentence(),
         },
-        'fecha': faker.date_time_between(start_date="2022-01-01", end_date="2024-12-31"),
+        'fecha': faker.date_time_between(start_date=datetime(2022, 1, 1), end_date=datetime(2024, 12, 31)),
         'datos': 1
     }
     for _ in range(10000)
@@ -139,7 +139,7 @@ pedidos = [
         'tenantID': usuario['tenant_id'],
         'usuarioID': usuario['user_id'],
         'pedidoID': faker.uuid4(),
-        'estado': get_estado(fecha_pedido := faker.date_time_between(start_date=usuario['fechaCreacion'], end_date="2024-12-31")),
+        'estado': get_estado(fecha_pedido := faker.date_time_between(start_date=usuario['fechaCreacion'], end_date=datetime(2024, 12, 31))),
         'datos': {
             'productosID': (productosID := random.sample(
                 [producto['producto_id'] for producto in productos if producto['tenant_id'] == usuario['tenant_id']], k=random.randint(1, 5))
@@ -164,7 +164,7 @@ def batch_write(table, items):
                 batch.put_item(Item=item)
             except Exception as e:
                 print(f"Error inserting item: {item}. Error: {e}")
-
+                # Optionally log this to a file or handle retries
 
 print("Inserting data into Tienda table...")
 batch_write(tienda_table, tiendas)
