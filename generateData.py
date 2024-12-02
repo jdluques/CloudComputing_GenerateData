@@ -119,22 +119,19 @@ productos_dict = {
 
 
 def get_estado(fecha_pedido):
-    # Calculate the difference between fechaPedido and current date
     delta = datetime.now() - fecha_pedido
 
-    # If more than 3 months, must be ENTREGADO or CANCELADO with higher chance for ENTREGADO
     if delta > timedelta(days=90):
-        return random.choices(["ENTREGADO", "CANCELADO"], [0.7, 0.3])[0]  # 70% for ENTREGADO, 30% for CANCELADO
+        return random.choices(["ENTREGADO", "CANCELADO"], [0.85, 0.15])[0]
 
-    # Otherwise, use weighted probabilities based on delta (how close the order is to today)
-    if delta.days < 0:  # Future orders
-        return "PENDIENTE"
+    prob_entregado = min(delta.days / 30 * 0.1, 0.7)
+    prob_pendiente = max(0.8 - (delta.days / 30 * 0.1), 0.2)
+    prob_cancelado = 1 - (prob_entregado + prob_pendiente)
 
-    # Adjust probability based on the number of days since order was placed
-    prob_entregado = min(delta.days / 30 * 0.1, 0.7)  # Probability of being delivered increases with age of order
-    prob_pendiente = max(0.8 - (delta.days / 30 * 0.1), 0.2)  # Less likely to be pending the older it gets
-
-    return random.choices(["PENDIENTE", "ENTREGADO"], [prob_pendiente, prob_entregado])[0]
+    return random.choices(
+        ["PENDIENTE", "ENTREGADO", "CANCELADO"],
+        [prob_pendiente, prob_entregado, prob_cancelado]
+    )[0]
 
 estados = ["PENDIENTE", "ENTREGADO", "CANCELADO"]
 pedidos = [
