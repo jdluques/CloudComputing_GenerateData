@@ -98,7 +98,7 @@ usuarios = [
 # Reseña
 resenias = [
     {
-        'tenant_id#producto_id': random.choice(tenant_ids) + "#" + random.choice(productos)['producto_id'],
+        'tenant_id#producto_id': f"{(tenant_id := random.choice(tenant_ids))}#{random.choice([p['producto_id'] for p in productos if p['tenant_id'] == tenant_id])}",
         'resenia_id': faker.uuid4(),
         'usuario_id': random.choice(usuarios)['user_id'],
         'detalle': {
@@ -160,7 +160,11 @@ pedidos = [
 def batch_write(table, items):
     with table.batch_writer() as batch:
         for item in items:
-            batch.put_item(Item=item)
+            try:
+                batch.put_item(Item=item)
+            except Exception as e:
+                print(f"Error inserting item: {item}. Error: {e}")
+
 
 print("Inserting data into Tienda table...")
 batch_write(tienda_table, tiendas)
