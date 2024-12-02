@@ -32,7 +32,7 @@ tenant_ids = ["Lunavie", "Glow", "Lumiere"]
 tiendas = [
     {
         'tenant_id': tenant_id,
-        'nombre': tenant_id,
+        'datos': { 'nombre': tenant_id },
         'fechaCreacion': faker.date_time_between(start_date="2021-10-01", end_date="2022-01-01")
     }
     for tenant_id in tenant_ids
