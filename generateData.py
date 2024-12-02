@@ -139,7 +139,7 @@ pedidos = [
         'tenantID': usuario['tenant_id'],
         'usuarioID': usuario['user_id'],
         'pedidoID': faker.uuid4(),
-        'estado': get_estado(fecha_pedido := faker.date_time_between(start_date=usuario['fechaCreacion'], end_date=datetime(2024, 12, 31))),
+        'estado': get_estado((fecha_pedido := faker.date_time_between(start_date=usuario['fechaCreacion'], end_date=datetime(2024, 12, 31))).isoformat()),
         'datos': {
             'productosID': (productosID := random.sample(
                 [producto['producto_id'] for producto in productos if producto['tenant_id'] == usuario['tenant_id']], k=random.randint(1, 5))
