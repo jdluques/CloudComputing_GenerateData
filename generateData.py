@@ -24,7 +24,7 @@ categoria_table = dynamodb.Table('Categoria')
 usuario_table = dynamodb.Table('Usuario')
 producto_table = dynamodb.Table('Producto')
 pedido_table = dynamodb.Table('Pedido')
-resena_table = dynamodb.Table('Resena')
+resenia_table = dynamodb.Table('Resenia')
 
 # Tienda
 tenant_ids = ["Lunavie", "Glow", "Lumiere"]
@@ -96,10 +96,10 @@ usuarios = [
 ]
 
 # Reseña
-resenas = [
+resenias = [
     {
         'tenant_id#producto_id': random.choice(tenant_ids) + "#" + random.choice(productos)['producto_id'],
-        'resena_id': faker.uuid4(),
+        'resenia_id': faker.uuid4(),
         'usuario_id': random.choice(usuarios)['user_id'],
         'detalle': {
             'puntaje': random.randint(1, 5),
@@ -174,7 +174,10 @@ batch_write(usuario_table, usuarios)
 print("Inserting data into Producto table...")
 batch_write(producto_table, productos)
 
-print("Inserting data into Resena table...")
-batch_write(resena_table, resenas)
+print("Inserting data into Resenia table...")
+batch_write(resenia_table, resenias)
+
+print("Inserting data into Pedidos table...")
+batch_write(pedido_table, pedidos)
 
 print("Data seeding completed!")
