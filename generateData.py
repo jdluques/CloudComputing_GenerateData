@@ -117,29 +117,13 @@ productos_dict = {
     for producto in productos
 }
 
-
-def get_estado(fecha_pedido):
-    delta = datetime.now() - fecha_pedido
-
-    if delta > timedelta(days=90):
-        return random.choices(["ENTREGADO", "CANCELADO"], [0.85, 0.15])[0]
-
-    prob_entregado = min(delta.days / 30 * 0.1, 0.7)
-    prob_pendiente = max(0.8 - (delta.days / 30 * 0.1), 0.2)
-    prob_cancelado = 1 - (prob_entregado + prob_pendiente)
-
-    return random.choices(
-        ["PENDIENTE", "ENTREGADO", "CANCELADO"],
-        [prob_pendiente, prob_entregado, prob_cancelado]
-    )[0]
-
 estados = ["PENDIENTE", "ENTREGADO", "CANCELADO"]
 pedidos = [
     {
         'tenantID': usuario['tenant_id'],
         'usuarioID': usuario['user_id'],
         'pedidoID': faker.uuid4(),
-        'estado': get_estado((fecha_pedido := faker.date_time_between(start_date=usuario['fechaCreacion'], end_date=datetime(2024, 12, 31))).isoformat()),
+        'estado': random.choice(estados),
         'datos': {
             'productosID': (productosID := random.sample(
                 [producto['producto_id'] for producto in productos if producto['tenant_id'] == usuario['tenant_id']], k=random.randint(1, 5))
@@ -150,7 +134,7 @@ pedidos = [
                 for producto_id in productosID if producto_id in productos_dict
             )
         },
-        'fechaPedido': fecha_pedido.isoformat()
+        'fechaPedido': faker.date_time_between(start_date=usuario['fechaCreacion'], end_date=datetime(2024, 12, 31)).isoformat()
     }
     for usuario in usuarios for _ in range(random.randint(1, 3))
 ]
