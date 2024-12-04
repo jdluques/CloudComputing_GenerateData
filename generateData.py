@@ -162,12 +162,12 @@ resenias = [
     {
         'tenant_id#producto_id': f"{(tenant_id := random.choice(tenant_ids))}#{random.choice([p['producto_id'] for p in productos if p['tenant_id'] == tenant_id])}",
         'resenia_id': faker.uuid4(),
-        'usuario_id': random.choice(usuarios)['user_id'],
+        'usuario_id': (usuario := random.choice([usuario for usuario in usuarios if usuario['tenant_id'] == tenant_id]))['user_id'],
         'detalle': {
-            'puntaje': (puntaje := random.randint(1, 5)),
+            'puntaje': (puntaje := random.randint(0, 5)),
             'comentario': random.choice(comentario_to_puntaje[puntaje]),
         },
-        'fecha': faker.date_time_between(start_date=datetime(2022, 1, 1), end_date=datetime(2024, 12, 31)),
+        'fecha': faker.date_time_between(start_date=usuario['fechaCreacion'], end_date=datetime(2024, 12, 31)),
         'datos': 1
     }
     for _ in range(10000)
