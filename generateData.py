@@ -4,9 +4,15 @@ import random
 from datetime import datetime, timedelta
 from dotenv import load_dotenv
 import os
+import uuid
+from decimal import Decimal
+
 
 # Initialize Faker and DynamoDB client
 faker = Faker()
+
+start_date = datetime.strptime("2020-01-01", "%Y-%m-%d")
+end_date = datetime.strptime("2023-12-31", "%Y-%m-%d")
 
 load_dotenv()
 
@@ -18,13 +24,12 @@ session = boto3.Session(
 )
 
 dynamodb = session.resource('dynamodb')
-
-tienda_table = dynamodb.Table('api-tienda-proyecto-dev-tienda')
+tienda_table = dynamodb.Table('dev-proyecto-tienda')
 categoria_table = dynamodb.Table('dev-t_categorias')
-usuario_table = dynamodb.Table('dev-usuarios')
+usuario_table = dynamodb.Table('dev-proyecto-usuarios')
 producto_table = dynamodb.Table('dev-proyecto_productos')
 pedido_table = dynamodb.Table('dev-proyecto-pedidos')
-resenia_table = dynamodb.Table('dev-proyecto_resenias')
+resenia_table = dynamodb.Table('proyecto-api-resenia-dev-resena')
 
 # Tienda
 tenant_ids = ["Lunavie", "Glow", "Lumiere"]
@@ -33,10 +38,12 @@ tiendas = [
     {
         'tenant_id': tenant_id,
         'datos': {'nombre': tenant_id},
-        'fechaCreacion': faker.date_time_between(start_date=datetime(2021, 10, 1), end_date=datetime(2022, 1, 1))
+        'fecha': faker.date_time_between(start_date=start_date, end_date=end_date)
     }
+
     for tenant_id in tenant_ids
 ]
+
 
 # Categoría
 categ_names = ["Ojos", "Rostro", "Labios", "Cejas y pestanias"]
@@ -56,7 +63,6 @@ categorias = [
     }
     for i, categ_name in enumerate(categ_names)
 ]
-
 # Producto
 adjectives = ["Radiant", "Glam", "Velvet", "Matte", "Shimmer", "Hydrating", "Bold", "Luxe", "Glow", "Flawless",
               "Luminous", "Soft", "Elegant"]
@@ -65,21 +71,21 @@ category_to_makeup_types = {
     "Ojos": ["Mascara", "Eyeliner", "Eyeshadow", "Primer"],
     "Rostro": ["Foundation", "Blush", "Highlighter", "Concealer"],
     "Labios": ["Lipstick", "Lip Gloss"],
-    "Cejas y pestanias": ["False Lashes", "Brow Pencil"]
+    "Cejas y pestanias": ["False Lashes"]
 }
+
 makeup_type_to_img = {
-    "Mascara": [],
-    "Eyeliner": [],
-    "Eyeshadow": [],
-    "Primer": [],
-    "Foundation": [],
-    "Blush": [],
-    "Highlighter": [],
-    "Concealer": [],
-    "Lipstick": [],
-    "Lip Gloss": [],
-    "False Lashes": [],
-    "Brow Pencil": []
+    "Mascara": ["Glow/14de21a81e0b49f6bc84130e09452f7f_20241205052409.jpg", "Lunavie/4e8e46d458ad490893efe4d0cd6ec65f_20241205054215.jpg", "Lumiere/f43dcfdf8d504fddab88396478d20003_20241205054257.jpg"],
+    "Eyeliner": ["Lumiere/d0b0a51f3b7540618a3bdcd036231c64_20241205054635.jpg", "Glow/180223ade26e41148c3e10d9fbb69184_20241205054652.jpg", "Lunavie/67abbd519ce84f38a7dd604ff2463a0c_20241205054708.jpg"],
+    "Eyeshadow": ["Lunavie/1b874ca12430435cae9cd799d7a4b1f1_20241205054901.jpg", "Lumiere/a90ca8e5a6bd420b83d423f0ab7c0ade_20241205054925.jpg", "Glow/4509c741cee34ef282b1ed6d23745ea1_20241205055112.jpg"],
+    "Primer": ["Glow/20e673b70b3b43b39594f37cf1d7f6fa_20241205055220.jpg","Lumiere/041814a9bc08425cbe0deca54e686326_20241205055252.jpg", "Lunavie/a4718207691d40f5ad8092756caf5e49_20241205055304.jpg" ],
+    "Foundation": ["Lunavie/4ece204afd8a44c9b3f8416db9354472_20241205055435.jpg", "Glow/8dd718abb68542bb9154cce95fb46e5e_20241205055445.jpg", "Lumiere/8d206b5564f74ec29494cf82566fb806_20241205055505.jpg"],
+    "Blush": ["Lumiere/06e264558be641c096ef4ae5c67f48a4_20241205060008.jpg","Glow/0ba5c213f1304e87a74ce81552c4d70f_20241205060030.jpg", "Lunavie/2b5045c0ba604df9b398e823ec3aaaae_20241205060040.jpg" ],
+    "Highlighter": ["Lunavie/4f1fdf11ce574d93ab1e14244b6d5196_20241205060210.jpg", "Glow/9d0d3f9838e645748814a85c1c6ab514_20241205060218.jpg", "Lumiere/0b9a07f9f2ee4bd9b973b7e9e38d9bce_20241205060239.jpg"],
+    "Concealer": ["Lumiere/5bc73060f28e4a9a9728ff95ff2a440b_20241205060448.jpg", "Glow/c1107cb010654a17b4c80021c884340d_20241205060456.jpg", "Lunavie/d5906b76f38a4d24af429b246d409a24_20241205060522.jpg"],
+    "Lipstick": ["Lunavie/1c223410b5f84bf1b0d893e74117bcb8_20241205060708.jpg", "Lumiere/3f8f5d41e97e4f6ba8a8b1744d19d5f3_20241205060732.jpg", "Glow/d7aa675506284c3eb26ff5298fdbe6ab_20241205060750.jpg"],
+    "Lip Gloss": ["Glow/edbdfb0c8fae41539f5cb56a0134d803_20241205060950.jpg","Lunavie/057cad2ca6fd4c8a98129247b39d6d0e_20241205061020.jpg", "Lumiere/e831c62691844811afcddcdb0f9b6bf6_20241205061032.jpg" ],
+    "False Lashes": ["Lumiere/33ef518946f4478a863c7dab5fc8309b_20241205061253.jpg", "Glow/b4ff7da0112a48c7b28510105aff4967_20241205061312.jpg", "Lunavie/39f71f17fe4f45918bcab3fa397263a2_20241205061330.jpg"]
 }
 
 productos = [
@@ -97,21 +103,26 @@ productos = [
 ]
 
 # Usuario
+# Generación de usuarios
+# Conversión de la fecha a una cadena en formato 'YYYY-MM-DD'
 usuarios = [
     {
-        'tenant_id': random.choice(tenant_ids),
-        'user_id': faker.uuid4(),
+        'user_id': str(uuid.uuid4()),  # Generar un UUID como 'user_id'
+        'tenant_id': random.choice(tenant_ids),  # Asumiendo que 'tenant_ids' está definido
         'email': faker.email(),
         'password': faker.password(),
-        'data': {'fullName': faker.name()},
-        'role': "user",
-        'fechaCreacion': (fecha_creacion := faker.date_time_between(start_date=datetime(2022, 1, 1),
-                                                                    end_date=datetime(2024, 12, 31))),
-        'ultimoAcceso': faker.date_time_between(start_date=fecha_creacion, end_date=datetime(2024, 12, 31)).isoformat()
+        'data': {
+            'nombre': faker.name()
+        },
+        'fechaCreacion': faker.date_this_decade().strftime('%Y-%m-%d')  # Formatear la fecha como cadena
     }
-    for _ in range(10000)
+    for _ in range(1000)  # Generar 1000 usuarios
 ]
 
+
+
+
+# Reseña
 # Reseña
 comentario_to_puntaje = {
     0: [
@@ -167,15 +178,18 @@ resenias = [
             'puntaje': (puntaje := random.randint(0, 5)),
             'comentario': random.choice(comentario_to_puntaje[puntaje]),
         },
-        'fecha': faker.date_time_between(start_date=usuario['fechaCreacion'], end_date=datetime(2024, 12, 31)),
-        'datos': 1
+        'fecha': faker.date_time_between(
+            start_date=usuario['fechaCreacion'],
+            end_date=datetime(2024, 12, 31)
+        ).isoformat(),
     }
     for _ in range(10000)
 ]
 
+
 # Pedido
 productos_dict = {
-    producto['producto_id']: producto  # Producto ID as key and full product as value
+    producto['producto_id']: producto  # Producto ID como clave y el producto completo como valor
     for producto in productos
 }
 
@@ -219,17 +233,26 @@ pedidos = [
     for usuario in usuarios for _ in range(random.randint(1, 3))
 ]
 
+def convert_floats_to_decimal(item):
+    for key, value in item.items():
+        if isinstance(value, float):
+            item[key] = Decimal(str(value))
+        elif isinstance(value, dict):
+            convert_floats_to_decimal(value)
+        elif isinstance(value, list):
+            for i in range(len(value)):
+                if isinstance(value[i], float):
+                    value[i] = Decimal(str(value[i]))
+                elif isinstance(value[i], dict):
+                    convert_floats_to_decimal(value[i])
+    return item
+
 
 def batch_write(table, items):
     with table.batch_writer() as batch:
         for item in items:
-            # Convert datetime fields to string format
-            for key, value in item.items():
-                if isinstance(value, datetime):
-                    item[key] = value.isoformat()
-
+            item = convert_floats_to_decimal(item)  # Convertir floats a Decimal
             batch.put_item(Item=item)
-
 
 print("Inserting data into Tienda table...")
 batch_write(tienda_table, tiendas)
